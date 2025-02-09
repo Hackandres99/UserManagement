@@ -1,0 +1,26 @@
+<h1 class="text-center mt-3">Registrarse</h1>
+<div class="container custom-container">
+    <form>
+        <div class="mb-3">
+            <label for="email" class="form-label">Correo electronico</label>
+            <input [(ngModel)]="user.email" name="email" type="email" class="form-control" id="email" aria-describedby="emailHelp">
+        </div>
+        <div class="mb-3">
+            <label for="firstname" class="form-label">Nombre</label>
+            <input [(ngModel)]="user.firstname" name="firstname" type="text" class="form-control" id="firstname">
+        </div>
+        <div class="mb-3">
+            <label for="lastname" class="form-label">Apellido</label>
+            <input [(ngModel)]="user.lastname" name="lastname" type="text" class="form-control" id="lastname">
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Contraseña</label>
+            <input [(ngModel)]="user.accountPassword" name="accountPassword"  type="password" class="form-control"
+            id="password">
+        </div>
+        <div class="mt-3 text-center">
+            <a routerLink="/">¿Ya tienes una cuenta?</a>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3 d-block mx-auto" (click)="signup()">Registrarse</button>
+    </form>
+</div>

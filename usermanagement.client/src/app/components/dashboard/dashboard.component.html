@@ -1,0 +1,21 @@
+<div class="container mt-4">
+    <div class="row">
+      <div class="col-md-6 offset-md-3">
+        <!-- Tarjeta con información del usuario -->
+        <div class="card">
+          <div class="card-header">
+            <h5>Datos del Usuario</h5>
+          </div>
+          <div class="card-body">
+            <h6 class="card-title">Información general</h6>
+            <p class="card-text"><strong>Nombre:</strong> {{ user.firstname }} {{ user.lastname }}</p>
+            <p class="card-text"><strong>Nombre de usuario:</strong> {{ user.username }}</p>
+            <p class="card-text"><strong>Email:</strong> {{ user.email }}</p>
+            <p class="card-text"><strong>Fecha de creación:</strong> {{ user.creationDate | date: 'dd/MM/yyyy' }}</p>
+            <p class="card-text"><strong>Última actualización:</strong> {{ user.updateDate | date: 'dd/MM/yyyy' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

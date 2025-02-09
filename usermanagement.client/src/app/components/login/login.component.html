@@ -1,0 +1,18 @@
+<h1 class="text-center mt-3">Iniciar sesión</h1>
+<div class="container custom-container">
+    <form>
+        <div class="mb-3">
+            <label for="email" class="form-label">Correo electrónico</label>
+            <input [(ngModel)]="login.email" name="email" type="email" class="form-control" id="email" aria-describedby="emailHelp">
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Contraseña</label>
+            <input [(ngModel)]="login.accountPassword" name="accountPassword" type="password" class="form-control" id="password">
+        </div>
+        <div class="mt-3 text-center">
+            <a routerLink="/reset-password">¿Olvidaste tu contraseña?</a> | 
+            <a routerLink="/signup">¿Aún no tienes una cuenta?</a>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3 d-block mx-auto" (click)="signin()">Iniciar sesión</button>    
+    </form>
+</div>
