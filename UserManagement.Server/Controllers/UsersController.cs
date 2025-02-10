@@ -12,20 +12,19 @@ namespace UserManagement.Server.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly UserManagementContext _context;
+		private readonly UserManagementContext _context;
 
         public UsersController(UserManagementContext context)
         {
             _context = context;
-        }
+		}
 
         [HttpGet("me")]
         public async Task<ActionResult<User>> GetUser()
         {
-			var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (id == null) return Unauthorized();
+			var userId = AuthorizedUserId();
+			if (userId == null) return Unauthorized();
 
-			Guid.TryParse(id, out Guid userId);
 			var user = await _context.Users.FindAsync(userId);
 			if (user == null) return NotFound();
 
@@ -35,9 +34,8 @@ namespace UserManagement.Server.Controllers
         [HttpPut("me")]
         public async Task<IActionResult> PutUser(User user)
         {
-			var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			Guid.TryParse(id, out Guid userId);
-			if (id == null || user.Id != userId) return Unauthorized();
+			var userId = AuthorizedUserId();
+			if (user.Id != userId) return Unauthorized();
             user.CreationDate = null;
             user.UpdateDate = null;
 			user.AccountPassword = EncryptData.EncryptPass(user.AccountPassword);
@@ -72,9 +70,8 @@ namespace UserManagement.Server.Controllers
         [HttpDelete("me")]
         public async Task<IActionResult> DeleteUser()
         {
-			var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			Guid.TryParse(id, out Guid userId);
-			if (id == null) return Unauthorized();
+			var userId = AuthorizedUserId();
+			if (userId == null) return Unauthorized();
 
 			var user = await _context.Users.FindAsync(userId);
 			if (user == null) return NotFound();
@@ -85,7 +82,51 @@ namespace UserManagement.Server.Controllers
             return NoContent();
         }
 
-        private bool UserExists(Guid id)
+		[HttpPost("upload-my-avatar")]
+		public async Task<IActionResult> UploadAvatar(IFormFile file)
+		{
+			var userId = AuthorizedUserId();
+			if (userId == null) return Unauthorized();
+
+			if (file == null || file.Length == 0) return BadRequest("No file uploaded.");
+
+			var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "avatars");
+
+			if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+
+			var avatarImagePath = $"{Guid.NewGuid()}_{file.FileName}";
+			var filePath = Path.Combine(uploadPath, avatarImagePath);
+
+			// Guardar el nuevo archivo
+			using (var stream = new FileStream(filePath, FileMode.Create))
+				await file.CopyToAsync(stream);
+
+			var user = await _context.Users.FindAsync(userId);
+			if (user == null) return NotFound("User not found");
+
+			// Eliminar el avatar anterior si existe
+			if (!string.IsNullOrEmpty(user.AvatarImagePath))
+			{
+				var oldAvatarPath = Path.Combine(uploadPath, user.AvatarImagePath);
+				if (System.IO.File.Exists(oldAvatarPath)) System.IO.File.Delete(oldAvatarPath);
+			}
+
+			// Actualizar el avatar del usuario
+			user.AvatarImagePath = avatarImagePath;
+			await _context.SaveChangesAsync();
+
+			return Ok(new { avatarImagePath });
+		}
+
+		private Guid? AuthorizedUserId()
+		{
+			var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			Guid.TryParse(id, out Guid userId);
+
+			return userId;
+		}
+
+		private bool UserExists(Guid? id)
         {
             return _context.Users.Any(e => e.Id == id);
         }

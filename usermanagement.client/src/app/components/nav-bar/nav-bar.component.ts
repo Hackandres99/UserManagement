@@ -10,15 +10,25 @@ import { Router } from '@angular/router';
   styleUrl: './nav-bar.component.css'
 })
 export class NavBarComponent implements OnInit, OnDestroy {
+  
   isAuthenticated: boolean = false;
   private authSubscription!: Subscription;
+  avatarPath: string = '';
 
-  constructor(private authService: AuthService, private userService: UserService, private router: Router) {}
+  constructor(
+    private authService: AuthService, 
+    private userService: UserService, 
+    private router: Router) {}
 
   ngOnInit() {
     this.authSubscription = this.authService.isAuthenticated$.subscribe(isAuth => {
       this.isAuthenticated = isAuth;
     });
+
+    this.userService.avatarImagePath$.subscribe(path => {
+      if (path) this.avatarPath = path
+    })
+
   }
 
   logout() {
